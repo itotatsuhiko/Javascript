@@ -22,6 +22,16 @@ public class Player {
 	//----------------------------------
 	//プレイヤークラスの操作
 	//----------------------------------
+
+	/*プレイヤークラスのコンストラクタ
+	 *
+	 * @param name 名前
+	 *
+	 * */
+
+	public Player (String name) {
+		this.name_=name;
+	}
 	/**じゃんけんの手をだす
 	 *
 	 * @return じゃんけんの手
@@ -48,6 +58,7 @@ public class Player {
 			hand = PAPER;
 			System.out.println("パー");
 		}
+		//決定した手を戻り値として返す
 //伊:		return playerHand;
 		return hand;
 	}
@@ -74,5 +85,13 @@ public class Player {
 
 //伊:		System.out.println(winCount_);
 		return winCount_;
+	}
+	/*
+	 * 自分の名前を答える
+	 *
+	 * @return 名前;
+	 */
+	public String getName() {
+		return name_;
 	}
 }
