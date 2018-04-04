@@ -1,95 +1,119 @@
-package Lesson3;
-
-import Lesson5.Tactics;
+package Lesson6;
 
 /**
- * ジャンケンを行うプレイヤークラス。
+ * ばば抜きのプレイヤークラス。
  */
-public class Player
-{
-	/** グー */
-	public static final int STONE = 0;
+public class Player {
+	/** 進行役 */
+	private Master master_;
 
-	/** チョキ */
-	public static final int SCISSORS = 1;
+	/** テーブル */
+	private Table  table_;
 
-	/** パー */
-	public static final int PAPER = 2;
+	/** 自分の手札 */
+	private Hand   myHand_ = new Hand();
 
-	/** プレイヤーの名前 */
-	private String name;
-
-	/** プレイヤーの勝った回数 */
-	private int winCount = 0;
-
-	/** 与えられた戦略 */
-	private Tactics tactics_;
+	/** 名前 */
+	private String name_;
 
 	/**
-	 * プレイヤークラスのコンストラクタ。
+	 * コンストラクタ。
 	 *
 	 * @param name 名前
+	 * @param master 進行役
+	 * @param table テーブル
 	 */
-	public Player(String name)
-	{
-		this.name = name;
+	public Player(String name, Master master, Table table) {
+		this.name_ = name;
+		this.master_ = master;
+		this.table_ = table;
 	}
 
 	/**
-	 * プレイヤーに戦略を渡す。
+	 * 順番を指名する。
 	 *
-	 * @param tactics 戦略
+	 * @param nextPlayer 次のプレイヤー
 	 */
-	void setTactics(Tactics tactics)
-	{
-		tactics_ = tactics;
-	}
+	public void play(Player nextPlayer) {
+		// 次のプレイヤーに手札を出してもらう
+		Hand nextHand = nextPlayer.showHand();
 
-	/**
-	 * ジャンケンの手を出す。
-	 *
-	 * @return ジャンケンの手
-	 */
-	int showHand()
-	{
-		// 与えられた戦略を読んでジャンケンの手を決める
-		int hand = tactics_.readTactics();
+		// 相手の手札からカードを一枚引く
+		Card pickedCard = nextHand.pickCard();
 
-		// 決定した手を戻り値として返す
-		return hand;
-	}
+		// 引いた結果を表示
+		System.out.println(this + "：" + nextPlayer + "さんから " + pickedCard
+				+ " を引きました");
 
-	/**
-	 * 勝敗を聞く(教える)。
-	 *
-	 * @param result true:勝ち,false:負け
-	 */
-	void notifyResult(boolean result)
-	{
-		if (true == result)
-		{
-			// 勝った場合は勝ち数を加算する
-			winCount += 1;
+		// 引いたカードを自分の手札に加え、同じ数のカードがあったら捨てる
+		dealCard(pickedCard);
+
+		// 手札がゼロになったかどうか調べる
+		if (myHand_.getNumberOfCards() == 0) {
+			// 進行役に上がりを宣言する
+			master_.declareWin(this);
+		} else {
+			// 現在の手札を表示する
+			System.out.println(this + "：残りの手札は " + myHand_ + "です");
 		}
 	}
 
 	/**
-	 * 自分の勝った回数を答える
+	 * 手札を見せる。
 	 *
-	 * @return 勝った回数
+	 * @return 自分の手札
 	 */
-	int getWinCount()
-	{
-		return winCount;
+	public Hand showHand() {
+		// もしこの時点で手札が残り1枚ならば上がりとなるので宣言する
+		if (myHand_.getNumberOfCards() == 1) {
+		    master_.declareWin(this);
+		}
+
+		// 見せる前にシャッフルする
+		myHand_.shuffle();
+
+		return myHand_;
 	}
 
 	/**
-	 * 自分の名前を答える。
+	 * カードを受け取る。
 	 *
-	 * @return 名前
+	 * @param card 受け取ったカード
 	 */
-	String getName()
-	{
-		return name;
+	public void receiveCard(Card card) {
+		// 引いたカードを自分の手札に加え、同じ数のカードがあったら捨てる
+		dealCard(card);
 	}
+
+	/**
+	 * カードを自分の手札に加え、同じ数のカードがあったら捨てる。
+	 *
+	 * @param card
+	 */
+	private void dealCard(Card card)
+	{
+		// カードを自分の手札に加える
+		myHand_.addCard(card);
+
+		// 今加えたカードと同じカードを探す
+		Card[] sameCards = myHand_.findSameNumberCard();
+
+		// 同じカードの組み合わせが存在した場合
+		if (sameCards != null) {
+			// テーブルへカードを捨てる
+			System.out.print(this + "：");
+			table_.disposeCard(sameCards);
+		}
+	}
+
+	/**
+	 * プレイヤーの名前を返す。 <br>
+	 * ObjectクラスのtoStringメソッドをオーバーライドしたメソッド。
+	 *
+	 * @return プレイヤーの名前
+	 */
+	public String toString() {
+		return name_;
+	}
+
 }
