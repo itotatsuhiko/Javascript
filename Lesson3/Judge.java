@@ -4,7 +4,7 @@ package Lesson3;
  * じゃんけんの審判を表すクラス
  * **/
 
-public class Judge_ {
+public class Judge {
 	/**
 	 * じゃんけんを開始する。
 	 *
